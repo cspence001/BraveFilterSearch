@@ -99,8 +99,8 @@ You can use this tool to debug and refine ad-blocking configurations by analyzin
 - If an ad blocker is causing issues with site functionality, you can review the filter lists and search for keywords related to the problematic ads or scripts. This can help pinpoint which filters are responsible and adjust your ad-blocking setup accordingly.
 
 **Discussions**:
-[How to view what Brave Shields blocks?](https://community.brave.com/t/how-to-view-what-brave-shields-blocks/443285/12) <br>
-[Show which filterlist blocked website](https://community.brave.com/t/adblock-show-which-filterlist-blocked-website/512493)
+- [How to view what Brave Shields blocks?](https://community.brave.com/t/how-to-view-what-brave-shields-blocks/443285/12) <br>
+- [Show which filterlist blocked website](https://community.brave.com/t/adblock-show-which-filterlist-blocked-website/512493)
 
 ---
 ## Contributing
