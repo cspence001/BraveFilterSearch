@@ -29,8 +29,8 @@ To run this application, you need to have Python and `pipenv` installed on your 
    First, clone the repository to your local machine:
 
    ```bash
-   git clone https://github.com/yourusername/brave-filter-gui.git
-   cd brave-filter-gui
+   git clone git@github.com:cspence001/BraveFilterSearch.git
+   cd BraveFilterSearch
    ```
 
 2. **Install Dependencies**
@@ -98,6 +98,7 @@ You can use this tool to debug and refine ad-blocking configurations by analyzin
 **Example**:
 - If an ad blocker is causing issues with site functionality, you can review the filter lists and search for keywords related to the problematic ads or scripts. This can help pinpoint which filters are responsible and adjust your ad-blocking setup accordingly.
 
+**Discussions**:
 [How to view what Brave Shields blocks?](https://community.brave.com/t/how-to-view-what-brave-shields-blocks/443285/12) <br>
 [Show which filterlist blocked website](https://community.brave.com/t/adblock-show-which-filterlist-blocked-website/512493)
 
