@@ -1,6 +1,9 @@
 # BraveFilterSearch
 Filter and Search contents of selected Brave Filter Lists
 
+![BraveFilterSearchGUI_comp](https://github.com/user-attachments/assets/0098f6bc-6919-40db-8c2b-97f3edafea63)
+
+
 ## Overview
 
 **Brave Filter GUI** is a desktop application designed for filtering and searching content from various filter lists. It allows users to select specific filter lists, search for keywords within the content of these lists, and view the results in an organized manner.
