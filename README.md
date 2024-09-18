@@ -12,7 +12,7 @@ This application is built using Python and the Tkinter library for the graphical
 
 ---
 
-**Note**: This application utilizes the [official catalog](https://github.com/brave/adblock-resources/blob/master/filter_lists/list_catalog.json) of Brave's default and optional adblock lists.
+**Note**: This application utilizes the [latest official catalog](https://github.com/brave/adblock-resources/blob/master/filter_lists/list_catalog.json) of Brave's default and optional adblock lists.
 In the browser, the optional lists can be found on the `brave://settings/shields/filters` settings page.
 
 The following lists are enabled by default:
