@@ -57,6 +57,13 @@ To run this application, you need to have Python and `pipenv` installed on your 
 
    To stop the application, you can close the GUI window or use `Ctrl+C` in the terminal where the script is running.
 
+5. **Create an alias for 1-step launch**
+
+   In your ~/.bash_profile / .zsh / .bash
+   ```bash
+   alias bravefilterapp="cd ~/path/to/packages/BraveFilterSearch; pipenv run python3 filter_search_app.py"
+   ```
+
 ### Troubleshooting:
 
 - **Virtual Environment Activation Issue**: If `pipenv shell` does not work or you encounter issues with the virtual environment, you can manually activate it using:
