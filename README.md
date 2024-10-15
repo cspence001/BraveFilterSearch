@@ -1,8 +1,7 @@
 # BraveFilterSearch
 Filter and Search contents of selected Brave Filter Lists
 
-![BraveFilterSearchGUI_comp](https://github.com/user-attachments/assets/0098f6bc-6919-40db-8c2b-97f3edafea63)
-
+![BraveFilterGUI](https://github.com/user-attachments/assets/932c3f3f-2b3e-42f7-8404-8131eab221d9)
 
 ## Overview
 
