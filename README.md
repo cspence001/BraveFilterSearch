@@ -6,7 +6,7 @@ Filter and Search contents of selected Brave Filter Lists
 
 ## Overview
 
-**Brave Filter GUI** is a desktop application designed for filtering and searching content from various filter lists. It allows users to select specific filter lists, search for keywords within the content of these lists, and view the results in an organized manner.
+**Brave Filter GUI** is a desktop application designed for filtering and searching content from Brave's opt-in list filters. Users can select specific filter lists, search for keywords within the content of these lists, and view the results in an organized manner. Includes options to view users active filters and custom filters.
 
 This application is built using Python and the Tkinter library for the graphical user interface. It leverages virtual environments to manage dependencies and ensure a consistent development setup.
 

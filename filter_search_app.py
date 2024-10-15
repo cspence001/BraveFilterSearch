@@ -4,6 +4,7 @@ import requests
 import os
 import sys
 import signal
+import json
 
 # Directory to store local content
 LOCAL_CONTENT_DIR = "local_content"
@@ -16,6 +17,79 @@ def fetch_json_data(url):
         return response.json()
     except requests.RequestException as e:
         print(f"Error fetching JSON data: {e}")
+        return []
+
+# Load the active filters
+def load_active_filters():
+    # Define the path to the JSON file
+    input_file_path = os.path.expanduser('~/Library/Application Support/BraveSoftware/Brave-Browser/Local State')
+
+    try:
+        # Read the raw content from the file
+        with open(input_file_path, 'r') as file:
+            raw_content = file.read()
+
+        # Locate the JSON part in the content
+        json_start_index = raw_content.find('{')
+        if json_start_index == -1:
+            raise ValueError("No valid JSON found in the file.")
+
+        # Extract the JSON string
+        json_string = raw_content[json_start_index:]
+
+        # Attempt to load the JSON data
+        data = json.loads(json_string)
+
+        # Get active filters
+        active_filters = [
+            uuid for uuid, details in data['brave']['ad_block']['regional_filters'].items()
+            if details.get('enabled')
+        ]
+        return active_filters
+
+    except FileNotFoundError:
+        print(f"File not found: {input_file_path}")
+        return []
+    except json.JSONDecodeError:
+        print("Error decoding JSON from the file. Please check the file format.")
+        return []
+    except Exception as e:
+        print(f"Error loading active filters: {e}")
+        return []
+
+
+# Function to toggle active filters
+def toggle_active_filters(var):
+    if var.get():
+        active_filters = load_active_filters()
+        for uuid in check_vars:
+            check_vars[uuid].set(1 if uuid in active_filters else 0)
+    else:
+        for uuid in check_vars:
+            check_vars[uuid].set(0)
+    update_results()  # Call to update the results after toggling filters
+
+# Load custom filters
+def load_custom_filters():
+    input_file_path = os.path.expanduser('~/Library/Application Support/BraveSoftware/Brave-Browser/Local State')
+
+    try:
+        with open(input_file_path, 'r') as file:
+            raw_content = file.read()
+
+        json_start_index = raw_content.find('{')
+        if json_start_index == -1:
+            raise ValueError("No valid JSON found in the file.")
+
+        json_string = raw_content[json_start_index:]
+
+        data = json.loads(json_string)
+
+        custom_filters = data['brave']['ad_block'].get('custom_filters', '').strip().splitlines()
+        return [filter for filter in custom_filters if filter]
+
+    except Exception as e:
+        print(f"Error loading custom filters: {e}")
         return []
 
 # Fetch the content from a URL and save it locally
@@ -55,12 +129,20 @@ def search_in_content(content, keyword):
 def update_results():
     keyword = keyword_var.get()
     selected_uuids = [uuid for uuid, var in check_vars.items() if var.get()]
+    custom_filters_enabled = custom_filters_var.get() == 1
 
     result_text.delete(1.0, tk.END)
 
-    if not selected_uuids:
-        result_text.insert(tk.END, "Please select at least one filter.")
+    if not selected_uuids and not custom_filters_enabled:
+        result_text.insert(tk.END, "Please select at least one filter or enable custom filters.")
         return
+
+    # If custom filters are enabled, add them to the results
+    if custom_filters_enabled:
+        custom_filters = load_custom_filters()
+        result_text.insert(tk.END, "\n\n--- Custom Filters ---\n\n")
+        for filter in custom_filters:
+            result_text.insert(tk.END, filter + "\n")
 
     # Dictionary to keep track of which URLs correspond to which titles
     url_title_mapping = {}
@@ -123,7 +205,7 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 def build_gui():
-    global check_vars, keyword_var, result_text, data, root
+    global check_vars, keyword_var, result_text, data, root, custom_filters_var
 
     root = tk.Tk()
     root.title("Filter Search App")
@@ -144,10 +226,24 @@ def build_gui():
 
     # Create a frame for the checkboxes and result area
     left_frame = ttk.Frame(root, padding="10")
-    left_frame.grid(row=0, column=0, sticky="nsew")
+    left_frame.pack(side="left", fill="both", expand=True)
 
     right_frame = ttk.Frame(root, padding="10")
-    right_frame.grid(row=0, column=1, sticky="nsew")
+    right_frame.pack(side="right", fill="both", expand=True)
+
+    # Create a frame for the active filters checkbox
+    active_filters_frame = ttk.Frame(right_frame)
+    active_filters_frame.grid(row=0, column=0, padx=10, pady=5, sticky="ew")
+
+    # Create a frame for the active filters checkbox
+    active_filters_var = tk.IntVar()
+    active_filters_checkbox = ttk.Checkbutton(active_filters_frame, text="Show My Active Filters", variable=active_filters_var, command=lambda: toggle_active_filters(active_filters_var))
+    active_filters_checkbox.grid(row=0, column=0, sticky="w")
+
+    # Add the checkbox
+    custom_filters_var = tk.IntVar()
+    custom_filters_checkbox = ttk.Checkbutton(active_filters_frame, text="My Custom Filters", variable=custom_filters_var, command=on_checkbox_change)
+    custom_filters_checkbox.grid(row=0, column=1, padx=10, pady=5, sticky="w")
 
     # Create canvas and scrollbar for checkboxes
     canvas = tk.Canvas(left_frame)
@@ -158,8 +254,8 @@ def build_gui():
     canvas.create_window((0, 0), window=checkbox_frame, anchor="nw")
     canvas.configure(yscrollcommand=scrollbar.set)
 
-    canvas.grid(row=0, column=0, sticky="nsew")
-    scrollbar.grid(row=0, column=1, sticky="ns")
+    canvas.pack(side="left", fill="both", expand=True)
+    scrollbar.pack(side="right", fill="y")
 
     # Add checkboxes to the checkbox frame
     check_vars = {}
@@ -178,15 +274,15 @@ def build_gui():
     checkbox_frame.bind("<Configure>", on_frame_configure)
 
     # Entry for keyword
-    ttk.Label(right_frame, text="Keyword:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ttk.Label(right_frame, text="Keyword:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
     keyword_var = tk.StringVar()
     keyword_var.trace_add("write", on_keyword_change)
     keyword_entry = ttk.Entry(right_frame, textvariable=keyword_var, width=50)
-    keyword_entry.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
+    keyword_entry.grid(row=2, column=0, padx=10, pady=5, sticky="ew")
 
     # Create a frame for the result text and scrollbar
     result_frame = ttk.Frame(right_frame)
-    result_frame.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
+    result_frame.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
 
     # Create the text widget for results
     result_text = tk.Text(result_frame, wrap=tk.WORD, width=80, height=20)
@@ -212,7 +308,7 @@ def build_gui():
     left_frame.grid_rowconfigure(0, weight=1)
     left_frame.grid_columnconfigure(0, weight=1)
 
-    right_frame.grid_rowconfigure(2, weight=1)
+    right_frame.grid_rowconfigure(3, weight=1)
     right_frame.grid_columnconfigure(0, weight=1)
 
     # Set the close event to clean up local content
