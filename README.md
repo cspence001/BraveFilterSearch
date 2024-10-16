@@ -92,16 +92,16 @@ To run this application, you need to have Python and `pipenv` installed on your 
 
 ## Example Use-Cases
 
-1. Identifying Blocked Page Elements
+1. **Identifying Blocked Page Elements**<br>
 Scenario: You're troubleshooting why a specific image or script isn't loading on a webpage.<br>
 Use: Input keywords related to the element (like the image URL or script name) into the search box. The tool will display if any filter rules are blocking that element.
-2. Analyzing Website-Specific Filters
+2. **Analyzing Website-Specific Filters**<br>
 Scenario: You want to understand what content is being blocked on a specific website.<br>
 Use: Enter the website's domain (e.g., example.com) into the search. The results will show which filter rules apply to that site, helping you determine the source of any issues.
-3. Debugging Ad Blockers
+3. **Debugging Ad Blockers**<br>
 Scenario: An ad blocker is interfering with a website's functionality.<br>
 Use: Search for keywords related to the ads or scripts causing issues. This can help you identify which filters are problematic and allow you to adjust your ad-blocking setup.
-4. Comparing Custom Filters
+4. **Comparing Custom Filters**<br>
 Scenario: You want to refine your custom filter list by comparing it with active filters.<br>
 Use: Load your custom filters, compare them with active filters, and see which ones are new (marked in green) or duplicates (marked in red) before adding.
 
