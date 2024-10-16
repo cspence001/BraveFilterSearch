@@ -136,12 +136,16 @@ def update_results():
     if not selected_uuids and not custom_filters_enabled:
         result_text.insert(tk.END, "Please select at least one filter or enable custom filters.")
         return
-
     # If custom filters are enabled, add them to the results
     if custom_filters_enabled:
         custom_filters = load_custom_filters()
+        filtered_custom_filters = (
+            [f for f in custom_filters if keyword.lower() in f.lower()] 
+            if keyword else custom_filters
+        )
+
         result_text.insert(tk.END, "\n\n--- Custom Filters ---\n\n")
-        for filter in custom_filters:
+        for filter in filtered_custom_filters:
             result_text.insert(tk.END, filter + "\n")
 
     # Dictionary to keep track of which URLs correspond to which titles

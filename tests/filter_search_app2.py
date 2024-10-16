@@ -96,8 +96,6 @@ def search_in_content(content, keyword):
     filtered_lines = [line for line in lines if keyword.lower() in line.lower() and not line.strip().startswith('!')]
     return filtered_lines
 
-current_filters = []
-
 # Update the results based on selected checkboxes and keyword
 def update_results():
     global current_filters  # Make current_filters accessible globally
@@ -106,6 +104,7 @@ def update_results():
     custom_filters_enabled = custom_filters_var.get() == 1
 
     result_text.delete(1.0, tk.END)
+    current_filters = []
 
     if not selected_uuids and not custom_filters_enabled:
         result_text.insert(tk.END, "Please select at least one filter or enable custom filters.")
@@ -114,10 +113,17 @@ def update_results():
     # If custom filters are enabled, add them to the results
     if custom_filters_enabled:
         custom_filters = load_custom_filters()
-        result_text.insert(tk.END, "\n\n--- Custom Filters ---\n\n")
-        for filter in custom_filters:
-            result_text.insert(tk.END, filter + "\n")
-            current_filters.append(filter)  # Keep track of custom filters
+        # If there's no keyword, show all custom filters
+        if keyword:
+            filtered_custom_filters = search_in_content("\n".join(custom_filters), keyword)
+        else:
+            filtered_custom_filters = custom_filters  # Show all if no keyword
+
+        if filtered_custom_filters:
+            result_text.insert(tk.END, "\n\n--- Custom Filters ---\n\n")
+            for filter in filtered_custom_filters:
+                result_text.insert(tk.END, filter + "\n")
+                current_filters.append(filter)  # Keep track of custom filters
 
     # Dictionary to keep track of which URLs correspond to which titles
     url_title_mapping = {}
@@ -224,7 +230,6 @@ def add_new_filters(new_filters):
     except Exception as e:
         print(f"Error adding new filters: {e}")
         messagebox.showerror("Error", "Failed to add new filters.")
-
 
 
 def create_filter_comparison_frame(right_frame):
