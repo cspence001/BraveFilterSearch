@@ -85,33 +85,25 @@ To run this application, you need to have Python and `pipenv` installed on your 
 1. **Launching the Application**: After running `filter_search_app.py`, a GUI window will open.
 2. **Selecting Filters**: Use the checkboxes on the left to select the filter lists you want to use.
 3. **Entering Keywords**: Type a keyword into the search box on the right to filter the content of the selected lists.
-4. **Compare Filters**: Use Load Custom Filters. Enter in filters under Add Custom Filters and click Compare. (If not selected prior, Active and Custom Filters will be automatically enabled for comparison.) New Filters appear as Green and duplicates appear Red.
-- For more information on Custom Filter Syntax and examples use [this gist](https://gist.github.com/cspence001/a7e50832ba9c682e4b7f53738383b8b9#custom-filters).
-5. **Add New Filters**: Clicking Add New Filters will add the new filters to Brave Custom Filters. 
-- <b>Important</b>: Ensure Brave Browser App is closed before adding new filters. 
+4. **Compare Filters**: Use `Load Custom Filters`. Enter in filters under Add Custom Filters and click `Compare Filters`. (If not selected prior, Active and Custom Filters will be automatically enabled for comparison.) New Filters appear as Green and duplicates appear Red.
+   - For more information on Custom Filter Syntax and examples use [this gist](https://gist.github.com/cspence001/a7e50832ba9c682e4b7f53738383b8b9#custom-filters).
+5. **Add New Filters**: Clicking `Add New Filters` will add the new filters to Brave Custom Filters. 
+   - <b>Important</b>: Ensure Brave Browser App is closed before adding new filters. 
 
 ## Example Use-Cases
 
-### 1. Identifying Scripts that Block Page Elements
-
-If you're troubleshooting why a specific page element isn't displaying on a webpage, you can use this tool to find out if any filter lists include rules that block that element. 
-
-**Example**: 
-- Suppose a page element such as an image or a script is not loading on a website. You can search for keywords related to that element (e.g., the URL or class name) within the filter lists. The results will show if any filter rules are likely to be blocking the element.
-
-### 2. Identifying Filters for Specific Websites
-
-This tool can help you identify which filter rules apply to particular websites. This is useful for understanding what content might be blocked on a website due to specific filter lists.
-
-**Example**:
-- If you want to find out which filter rules are applied to `example.com`, you can enter relevant keywords or URL patterns into the search box. The application will display which filter lists contain rules that could affect the content or functionality of `example.com`.
-
-### 3. Debugging Ad Blockers
-
-You can use this tool to debug and refine ad-blocking configurations by analyzing which filters are in place and how they might impact various elements on a website.
-
-**Example**:
-- If an ad blocker is causing issues with site functionality, you can review the filter lists and search for keywords related to the problematic ads or scripts. This can help pinpoint which filters are responsible and adjust your ad-blocking setup accordingly.
+1. Identifying Blocked Page Elements
+Scenario: You're troubleshooting why a specific image or script isn't loading on a webpage.<br>
+Use: Input keywords related to the element (like the image URL or script name) into the search box. The tool will display if any filter rules are blocking that element.
+2. Analyzing Website-Specific Filters
+Scenario: You want to understand what content is being blocked on a specific website.<br>
+Use: Enter the website's domain (e.g., example.com) into the search. The results will show which filter rules apply to that site, helping you determine the source of any issues.
+3. Debugging Ad Blockers
+Scenario: An ad blocker is interfering with a website's functionality.<br>
+Use: Search for keywords related to the ads or scripts causing issues. This can help you identify which filters are problematic and allow you to adjust your ad-blocking setup.
+4. Comparing Custom Filters
+Scenario: You want to refine your custom filter list by comparing it with active filters.<br>
+Use: Load your custom filters, compare them with active filters, and see which ones are new (marked in green) or duplicates (marked in red) before adding.
 
 **Discussions**:
 - [How to view what Brave Shields blocks?](https://community.brave.com/t/how-to-view-what-brave-shields-blocks/443285/12) <br>
