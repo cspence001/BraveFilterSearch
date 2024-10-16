@@ -1,7 +1,7 @@
 # BraveFilterSearch
 Filter and Search contents of selected Brave Filter Lists
 
-![BraveFilterGUI](https://github.com/user-attachments/assets/932c3f3f-2b3e-42f7-8404-8131eab221d9)
+![BraveFilterGUI](https://github.com/user-attachments/assets/778b07f9-1fe8-439d-a8e1-926bb1acae1e)
 
 ## Overview
 
@@ -10,7 +10,7 @@ Filter and Search contents of selected Brave Filter Lists
 - View your Active and Custom Filters. 
 - Compare new filters and Add to custom filters in Brave.
 
-This application is built using Python and the Tkinter library for the graphical user interface. It leverages virtual environments to manage dependencies and ensure a consistent development setup.
+This application is built using Python and the Tkinter library for the graphical user interface. It leverages `pipenv` to manage dependencies. Built for Brave on macOS. 
 
 ---
 
