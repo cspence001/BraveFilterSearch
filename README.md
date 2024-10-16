@@ -1,5 +1,5 @@
 # BraveFilterSearch
-Filter and Search contents of selected Brave Filter Lists
+Filter and Search contents of selected Brave Filter Lists. Compare + Add Custom Filters.
 
 ![BraveFilterGUI](https://github.com/user-attachments/assets/932c3f3f-2b3e-42f7-8404-8131eab221d9)
 
