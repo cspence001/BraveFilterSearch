@@ -5,7 +5,10 @@ Filter and Search contents of selected Brave Filter Lists
 
 ## Overview
 
-**Brave Filter GUI** is a desktop application designed for filtering and searching content from Brave's opt-in list filters. Users can select specific filter lists, search for keywords within the content of these lists, and view the results in an organized manner. Includes options to view users active filters and custom filters.
+**Brave Filter GUI** is a desktop application designed for filtering and searching content from Brave's opt-in list filters. <br>
+- Select and search up-to-date Brave opt-in filter lists.
+- View your Active and Custom Filters. 
+- Compare new filters and Add to custom filters in Brave.
 
 This application is built using Python and the Tkinter library for the graphical user interface. It leverages virtual environments to manage dependencies and ensure a consistent development setup.
 
@@ -82,7 +85,10 @@ To run this application, you need to have Python and `pipenv` installed on your 
 1. **Launching the Application**: After running `filter_search_app.py`, a GUI window will open.
 2. **Selecting Filters**: Use the checkboxes on the left to select the filter lists you want to use.
 3. **Entering Keywords**: Type a keyword into the search box on the right to filter the content of the selected lists.
-4. **Viewing Results**: The search results will be displayed in the main area of the GUI.
+4. **Compare Filters**: Use Load Custom Filters. Enter in filters under Add Custom Filters and click Compare. (If not selected prior, Active and Custom Filters will be automatically enabled for comparison.) New Filters appear as Green and duplicates appear Red.
+- For more information on Custom Filter Syntax and examples use [this gist](https://gist.github.com/cspence001/a7e50832ba9c682e4b7f53738383b8b9#custom-filters).
+5. **Add New Filters**: Clicking Add New Filters will add the new filters to Brave Custom Filters. 
+- <b>Important</b>: Ensure Brave Browser App is closed before adding new filters. 
 
 ## Example Use-Cases
 

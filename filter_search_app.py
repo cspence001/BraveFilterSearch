@@ -21,42 +21,21 @@ def fetch_json_data(url):
 
 # Load the active filters
 def load_active_filters():
-    # Define the path to the JSON file
     input_file_path = os.path.expanduser('~/Library/Application Support/BraveSoftware/Brave-Browser/Local State')
-
     try:
-        # Read the raw content from the file
         with open(input_file_path, 'r') as file:
             raw_content = file.read()
-
-        # Locate the JSON part in the content
         json_start_index = raw_content.find('{')
-        if json_start_index == -1:
-            raise ValueError("No valid JSON found in the file.")
-
-        # Extract the JSON string
         json_string = raw_content[json_start_index:]
-
-        # Attempt to load the JSON data
         data = json.loads(json_string)
-
-        # Get active filters
         active_filters = [
             uuid for uuid, details in data['brave']['ad_block']['regional_filters'].items()
             if details.get('enabled')
         ]
         return active_filters
-
-    except FileNotFoundError:
-        print(f"File not found: {input_file_path}")
-        return []
-    except json.JSONDecodeError:
-        print("Error decoding JSON from the file. Please check the file format.")
-        return []
-    except Exception as e:
+    except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"Error loading active filters: {e}")
         return []
-
 
 # Function to toggle active filters
 def toggle_active_filters(var):
@@ -72,22 +51,14 @@ def toggle_active_filters(var):
 # Load custom filters
 def load_custom_filters():
     input_file_path = os.path.expanduser('~/Library/Application Support/BraveSoftware/Brave-Browser/Local State')
-
     try:
         with open(input_file_path, 'r') as file:
             raw_content = file.read()
-
         json_start_index = raw_content.find('{')
-        if json_start_index == -1:
-            raise ValueError("No valid JSON found in the file.")
-
         json_string = raw_content[json_start_index:]
-
         data = json.loads(json_string)
-
         custom_filters = data['brave']['ad_block'].get('custom_filters', '').strip().splitlines()
         return [filter for filter in custom_filters if filter]
-
     except Exception as e:
         print(f"Error loading custom filters: {e}")
         return []
@@ -127,26 +98,32 @@ def search_in_content(content, keyword):
 
 # Update the results based on selected checkboxes and keyword
 def update_results():
+    global current_filters  # Make current_filters accessible globally
     keyword = keyword_var.get()
     selected_uuids = [uuid for uuid, var in check_vars.items() if var.get()]
     custom_filters_enabled = custom_filters_var.get() == 1
 
     result_text.delete(1.0, tk.END)
+    current_filters = []
 
     if not selected_uuids and not custom_filters_enabled:
         result_text.insert(tk.END, "Please select at least one filter or enable custom filters.")
         return
+
     # If custom filters are enabled, add them to the results
     if custom_filters_enabled:
         custom_filters = load_custom_filters()
-        filtered_custom_filters = (
-            [f for f in custom_filters if keyword.lower() in f.lower()] 
-            if keyword else custom_filters
-        )
+        # If there's no keyword, show all custom filters
+        if keyword:
+            filtered_custom_filters = search_in_content("\n".join(custom_filters), keyword)
+        else:
+            filtered_custom_filters = custom_filters  # Show all if no keyword
 
-        result_text.insert(tk.END, "\n\n--- Custom Filters ---\n\n")
-        for filter in filtered_custom_filters:
-            result_text.insert(tk.END, filter + "\n")
+        if filtered_custom_filters:
+            result_text.insert(tk.END, "\n\n--- Custom Filters ---\n\n")
+            for filter in filtered_custom_filters:
+                result_text.insert(tk.END, filter + "\n")
+                current_filters.append(filter)  # Keep track of custom filters
 
     # Dictionary to keep track of which URLs correspond to which titles
     url_title_mapping = {}
@@ -179,9 +156,135 @@ def update_results():
                             result_text.insert(tk.END, f"--- Filter: {title} ---\n\n", "uuid_title")  # Use the title from the source
                             for line in filtered_lines:
                                 result_text.insert(tk.END, line + "\n")
+                                current_filters.append(line)  # Add filtered lines to current filters
 
-    if result_text.get(1.0, tk.END).strip() == "":
+    if not current_filters:
         result_text.insert(tk.END, "No results found.")
+
+def compare_filters(new_filter_text):
+
+    new_filters = new_filter_text.strip().splitlines()
+
+    # Ensure both filters are enabled
+    if active_filters_var.get() == 0:
+        active_filters_var.set(1)  # Enable "Show My Active Filters"
+        toggle_active_filters(active_filters_var)  # Load active filters
+
+    if custom_filters_var.get() == 0:
+        custom_filters_var.set(1)  # Enable "My Custom Filters"
+        # Load custom filters if not already loaded
+        update_results()  # This will also load custom filters into results
+
+    # Clear previous results
+    compare_results_text.delete(1.0, tk.END)
+
+    if not new_filters:
+        messagebox.showinfo("Info", "Please enter filters to compare.")
+        return
+
+    # Now both filters are guaranteed to be enabled
+    for new_filter in new_filters:
+        if new_filter in current_filters:
+            # Highlight duplicate filters in red
+            compare_results_text.insert(tk.END, f"{new_filter}\n", "duplicate_filter")
+        else:
+            # Highlight new filters in green
+            compare_results_text.insert(tk.END, f"{new_filter}\n", "new_filter")
+
+    # Configure tags for highlighting
+    compare_results_text.tag_configure("new_filter", foreground="green")
+    compare_results_text.tag_configure("duplicate_filter", foreground="red")
+
+
+def add_new_filters(new_filters):
+    input_file_path = os.path.expanduser('~/Library/Application Support/BraveSoftware/Brave-Browser/Local State')
+
+    try:
+        with open(input_file_path, 'r') as file:
+            raw_content = file.read()
+
+        json_start_index = raw_content.find('{')
+        json_string = raw_content[json_start_index:]
+        data = json.loads(json_string)
+
+        # Get existing custom filters
+        existing_custom_filters = data['brave']['ad_block'].get('custom_filters', '').strip().splitlines()
+
+        # Create a set for fast lookup of existing filters
+        existing_filter_set = set(existing_custom_filters)
+
+        # Keep track of whether we have added any new filters
+        new_filters_added = False
+
+        # Append new filters while avoiding duplicates
+        for new_filter in new_filters:
+            if new_filter and new_filter not in existing_filter_set:
+                existing_custom_filters.append(new_filter)
+                new_filters_added = True  # Mark that a new filter was added
+
+        if not new_filters_added:
+            messagebox.showinfo("Info", "No new Filters to Add.")
+            return
+
+        # Update the custom filters in the data
+        data['brave']['ad_block']['custom_filters'] = "\n".join(existing_custom_filters)
+
+        # Save the updated data back to the file
+        with open(input_file_path, 'w') as file:
+            file.write(json.dumps(data, indent=4))
+
+        messagebox.showinfo("Success", "New filters added successfully!")
+
+    except Exception as e:
+        print(f"Error adding new filters: {e}")
+        messagebox.showerror("Error", "Failed to add new filters.")
+
+
+def create_filter_comparison_frame(right_frame):
+    global filter_comparison_frame, filter_text, compare_results_text, filter_button
+
+    filter_comparison_frame = ttk.Frame(right_frame)
+    filter_comparison_frame.grid(row=3, column=1, padx=10, pady=5, sticky="nsew")
+
+    # Button to toggle visibility of the filter comparison section
+    filter_button = ttk.Button(filter_comparison_frame, text="Load Custom Filters", command=toggle_filter_frame)
+    filter_button.pack(pady=5)
+
+    # Create a frame for the additional filters
+    comparison_content_frame = ttk.LabelFrame(filter_comparison_frame, text="Add Custom Filters", padding="10")
+    comparison_content_frame.pack(padx=5, pady=5, fill="both", expand=True)
+
+    # Text area for user to paste additional filters
+    filter_text = tk.Text(comparison_content_frame, height=20, width=50)
+    filter_text.pack(padx=5, pady=5)
+
+    # Button to compare filters
+    compare_button = ttk.Button(comparison_content_frame, text="Compare Filters", command=lambda: compare_filters(filter_text.get("1.0", tk.END)))
+    compare_button.pack(pady=5)
+
+    # New results box for comparison results
+    compare_results_text = tk.Text(comparison_content_frame, height=20, width=50, wrap=tk.WORD)
+    compare_results_text.pack(padx=5, pady=5)
+
+    # Add the note
+    note_label = ttk.Label(comparison_content_frame, text="Ensure Brave Browser Application is closed before Adding new Filters", foreground="red")
+    note_label.pack(pady=5)
+
+    # Button to add new filters
+    add_filters_button = ttk.Button(comparison_content_frame, text="Add New Filters", command=lambda: add_new_filters(filter_text.get("1.0", tk.END).strip().splitlines()))
+    add_filters_button.pack(pady=5)
+
+    # Initially hide the comparison frame
+    comparison_content_frame.pack_forget()
+
+
+def toggle_filter_frame():
+    if filter_button['text'] == "Load Custom Filters":
+        filter_button['text'] = "Hide Custom Filters"
+        filter_comparison_frame.children['!labelframe'].pack(padx=5, pady=5, fill="both", expand=True)
+    else:
+        filter_button['text'] = "Load Custom Filters"
+        filter_comparison_frame.children['!labelframe'].pack_forget()
 
 # Function to handle checkbox state change
 def on_checkbox_change(*args):
@@ -209,8 +312,7 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 def build_gui():
-    global check_vars, keyword_var, result_text, data, root, custom_filters_var
-
+    global check_vars, keyword_var, result_text, data, root, custom_filters_var, current_filters, active_filters_var, custom_filters_var
     root = tk.Tk()
     root.title("Filter Search App")
 
@@ -234,6 +336,9 @@ def build_gui():
 
     right_frame = ttk.Frame(root, padding="10")
     right_frame.pack(side="right", fill="both", expand=True)
+
+    # Add the filter comparison frame
+    create_filter_comparison_frame(right_frame)
 
     # Create a frame for the active filters checkbox
     active_filters_frame = ttk.Frame(right_frame)
